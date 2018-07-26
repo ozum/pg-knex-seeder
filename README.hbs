@@ -1,0 +1,35 @@
+<!-- DO NOT EDIT README.md (It will be overridden by README.hbs) -->
+
+# pg-knex-seeder
+
+Generates [Knex seed files](https://knexjs.org/#Seeds-CLI) from a PostgreSQL database using all or selected tables.
+
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
+# Synopsis
+
+```js
+import generateSeed from "pg-knex-seeder"
+
+generateSeed({ outDir: `${__dirname}/seeds` })
+  .then(() => console.log("Seeds are generated..."))
+  .catch(e => console.error(e));
+
+// with some parameters
+
+generateSeed({
+  envName: "PG_CONNECTION_STRING",  // Or use `connection` parameter
+  outDir: process.cwd(),
+  tables: ["other_schema.member", "member", "product"],
+  increment: 5,
+  schemaInFilename: true,
+  })
+  .then(() => console.log("Seeds are generated..."))
+  .catch(e => console.error(e));
+```
+
+# API
+{{>main~}}

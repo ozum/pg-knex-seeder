@@ -1,0 +1,150 @@
+{
+  "createdDataFiles": [],
+  "directories": [],
+  "files": {
+    ".env": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    ".env.sample": "541a113c4498a32afd4d6194f9e4c477c759c5c5",
+    ".npmignore": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/npmignore",
+    ".gitignore": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/gitignore/compiled",
+    ".gitattributes": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/gitattributes",
+    ".editorconfig": "c50319bb37e0b3e644a50e482e51c3907b6a5656",
+    "LICENSE": "f888125841f571dba30141f26296c3604eaa6faa",
+    "README.hbs": "dbcf77b557876f891a70f076a32a596929ad97c7",
+    ".prettierrc.js": "e7752656e37970910d6a56d49f00dcc609d959f4",
+    ".prettierignore": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/prettierignore/compiled",
+    ".huskyrc.js": "d699091e567c2e0216004c2827daa8c8b008e2c6",
+    "commitlint.config.js": "5bde02ad345aad2a2206f6af8b92e913cd8e8e32",
+    "tslint.json": "2aad7bc9af15b75d9af518d68a6d8a5281f35b14",
+    "tsconfig.json": "53861c8e1ccba4c9ea2deaae2814d55b44b8e1f6",
+    "tsconfig-test.json": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/tsconfig/backend-test.json",
+    "package.json": [
+      {
+        "op": "test",
+        "path": "/scripts/test",
+        "value": "moe-scripts test"
+      },
+      {
+        "op": "replace",
+        "path": "/scripts/test",
+        "value": "echo \"Error: no test specified\" && exit 1"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/release",
+        "value": "git checkout master && git pull origin master && standard-version && git push --follow-tags origin master && npm publish"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/release"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/squash",
+        "value": "BRANCH=`git rev-parse --abbrev-ref HEAD` && git checkout master && git merge --squash $BRANCH && npm run commit"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/squash"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/prepublishOnly",
+        "value": "npm run build"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/prepublishOnly"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/commit",
+        "value": "moe-scripts commit"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/commit"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/validate",
+        "value": "moe-scripts validate"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/validate"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/format",
+        "value": "moe-scripts format"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/format"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/lint",
+        "value": "moe-scripts lint"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/lint"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/test:update",
+        "value": "moe-scripts test --updateSnapshot"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/test:update"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/build:doc",
+        "value": "moe-scripts doc --no-cache"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/build:doc"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/build",
+        "value": "moe-scripts build"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/build"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/watch",
+        "value": "concurrently 'npm run build -- --watch' 'npm run test -- --watch' | awk '{gsub(/\\033c/,\"\") system(\"\")}1'"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/watch"
+      },
+      {
+        "op": "test",
+        "path": "/scripts/file",
+        "value": "f() { P=$1; P=${P/src/lib}; P=${P/.ts/.js}; tsc-watch --onSuccess \"node -r source-map-support/register ${P}\"; }; f"
+      },
+      {
+        "op": "remove",
+        "path": "/scripts/file"
+      },
+      {
+        "op": "test",
+        "path": "/files",
+        "value": ["lib", "bin", "@types"]
+      },
+      {
+        "op": "remove",
+        "path": "/files"
+      }
+    ]
+  }
+}
