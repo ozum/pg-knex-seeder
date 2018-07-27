@@ -10,7 +10,9 @@ Generates [Knex seed files](https://knexjs.org/#Seeds-CLI) from a PostgreSQL dat
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Synopsis](#synopsis)
-- [API](#api)
+  - [CLI](#cli)
+  - [API](#api)
+- [API](#api-1)
   - [Functions](#functions)
   - [Typedefs](#typedefs)
   - [generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename]) ⇒ <code>Promise.&lt;void&gt;</code>](#generateenvname-connection-outdir-tables-schemas-increment-schemainfilename-%E2%87%92-codepromiseltvoidgtcode)
@@ -19,6 +21,15 @@ Generates [Knex seed files](https://knexjs.org/#Seeds-CLI) from a PostgreSQL dat
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Synopsis
+
+## CLI
+
+```
+$ npx pg-knex-seeder --out-dir seeds
+$ npx pg-knex-seeder --out-dir seeds --env-name PG_CONNECTION_STRING --tables member,public.products --increment 5
+```
+
+## API
 
 ```js
 import generateSeed from "pg-knex-seeder";

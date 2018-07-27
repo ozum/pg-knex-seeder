@@ -11,6 +11,15 @@ Generates [Knex seed files](https://knexjs.org/#Seeds-CLI) from a PostgreSQL dat
 
 # Synopsis
 
+## CLI
+
+```
+$ npx pg-knex-seeder --out-dir seeds
+$ npx pg-knex-seeder --out-dir seeds --env-name PG_CONNECTION_STRING --tables member,public.products --increment 5
+```
+
+## API
+
 ```js
 import generateSeed from "pg-knex-seeder"
 
@@ -21,12 +30,12 @@ generateSeed({ outDir: `${__dirname}/seeds` })
 // with some parameters
 
 generateSeed({
-  envName: "PG_CONNECTION_STRING",  // Or use `connection` parameter
+  envName: "PG_CONNECTION_STRING", // Or use `connection` parameter
   outDir: process.cwd(),
   tables: ["other_schema.member", "member", "product"],
   increment: 5,
   schemaInFilename: true,
-  })
+})
   .then(() => console.log("Seeds are generated..."))
   .catch(e => console.error(e));
 ```
