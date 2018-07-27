@@ -1,6 +1,7 @@
+#!/usr/bin/env node
+
 import pickBy from "lodash.pickBy";
-import generate from "./index";
-import { isAbsolute } from "path";
+import generate from "../index";
 const yargsInteractive = require("yargs-interactive");
 
 const options: { [name: string]: any } = {

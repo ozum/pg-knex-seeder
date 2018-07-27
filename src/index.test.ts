@@ -1,74 +1,54 @@
-import PgTestUtil from "pg-test-util";
 import { join } from "path";
 import generateSeed from "./index";
-import tempDir from "temp-dir";
-import { readFile, remove, readdir } from "fs-extra";
+import { remove } from "fs-extra";
+import { expectEqualFiles, getRandom, getDb } from "./__test_supplements__/util";
+const tempDir = require("temp-dir");
 
-const NAME = "pg-knex-seeder-test";
-const DIR = join(tempDir, NAME);
-const SQLFILE = join(__dirname, "__test_supplements__/sql/create-test-db.sql");
-const envName = "PG_NON_DEFAULT_STRING";
+const TEMPDIR = join(tempDir, getRandom());
 
-let pgTestUtil;
+const envName = "PG_TEST_CONNECTION_STRING_API";
+
 let db;
-let knex;
-
-async function isEqual(subDir) {
-  const dir = join(DIR, subDir);
-  const expectedDir = join(__dirname, "./__test_supplements__/expected", subDir);
-
-  const files = await readdir(dir);
-  const expectedFiles = await readdir(expectedDir);
-
-  expect(files).toEqual(expectedFiles);
-
-  files.map(async file => {
-    const content = await readFile(join(dir, file));
-    const expectedContent = await readFile(join(expectedDir, file));
-    expect(content.toString()).toBe(expectedContent.toString());
-  });
-}
+let pgTestUtil;
 
 beforeAll(async () => {
-  pgTestUtil = await new PgTestUtil({ dropOnlyCreated: false }); // Uses connection string from: process.env.PG_TEST_CONNECTION_STRING
-  db = await pgTestUtil.createDatabase({ name: NAME, file: SQLFILE });
-  knex = db.knex;
+  ({ db, pgTestUtil } = await getDb("pg-knex-seeder-test-api"));
 });
 
 afterAll(async () => {
-  await remove(DIR);
-  await pgTestUtil.dropDatabase(NAME);
+  await remove(TEMPDIR);
+  await pgTestUtil.dropAllDatabases();
 });
 
 describe("generateSeed", () => {
   it("should create numbered files", async () => {
-    await generateSeed({ envName, outDir: join(DIR, "default") });
-    await isEqual("default");
+    await generateSeed({ envName, outDir: join(TEMPDIR, "default") });
+    await expectEqualFiles(TEMPDIR, "default");
   });
 
   it("should create numbered files only for selected tables", async () => {
-    await generateSeed({ envName, outDir: join(DIR, "selected"), tables: ["Color"] });
-    await isEqual("selected");
+    await generateSeed({ envName, outDir: join(TEMPDIR, "selected"), tables: ["Color"] });
+    await expectEqualFiles(TEMPDIR, "selected");
   });
 
   it("should create numbered files only for selected tables with schema", async () => {
-    await generateSeed({ envName, outDir: join(DIR, "selected-with-schema"), tables: ["public.Color"] });
-    await isEqual("selected-with-schema");
+    await generateSeed({ envName, outDir: join(TEMPDIR, "selected-with-schema"), tables: ["public.Color"] });
+    await expectEqualFiles(TEMPDIR, "selected-with-schema");
   });
 
   it("should create non-numbered files", async () => {
-    await generateSeed({ envName, outDir: join(DIR, "non-numbered"), increment: null });
-    await isEqual("non-numbered");
+    await generateSeed({ envName, outDir: join(TEMPDIR, "non-numbered"), increment: null });
+    await expectEqualFiles(TEMPDIR, "non-numbered");
   });
 
   it("should create odd-numbered files", async () => {
-    await generateSeed({ envName, outDir: join(DIR, "odd-numbered"), increment: 2 });
-    await isEqual("odd-numbered");
+    await generateSeed({ envName, outDir: join(TEMPDIR, "odd-numbered"), increment: 2 });
+    await expectEqualFiles(TEMPDIR, "odd-numbered");
   });
 
   it("should create files including schema name", async () => {
-    await generateSeed({ envName, outDir: join(DIR, "schema"), schemaInFilename: true });
-    await isEqual("schema");
+    await generateSeed({ envName, outDir: join(TEMPDIR, "schema"), schemaInFilename: true });
+    await expectEqualFiles(TEMPDIR, "schema");
   });
 
   it("should throw if environment variable is empty and no connection parameters are provided", async () => {

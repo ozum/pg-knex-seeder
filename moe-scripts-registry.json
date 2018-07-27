@@ -4,12 +4,12 @@
   "files": {
     ".env": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
     ".env.sample": "541a113c4498a32afd4d6194f9e4c477c759c5c5",
+    "README.hbs": "dbcf77b557876f891a70f076a32a596929ad97c7",
     ".npmignore": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/npmignore",
     ".gitignore": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/gitignore/compiled",
     ".gitattributes": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/gitattributes",
     ".editorconfig": "c50319bb37e0b3e644a50e482e51c3907b6a5656",
     "LICENSE": "f888125841f571dba30141f26296c3604eaa6faa",
-    "README.hbs": "dbcf77b557876f891a70f076a32a596929ad97c7",
     ".prettierrc.js": "e7752656e37970910d6a56d49f00dcc609d959f4",
     ".prettierignore": "/Users/ozum/Development/pg-knex-seeder/node_modules/moe-scripts/lib/config/prettierignore/compiled",
     ".huskyrc.js": "d699091e567c2e0216004c2827daa8c8b008e2c6",
