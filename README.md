@@ -15,7 +15,9 @@ Generates [Knex seed files](https://knexjs.org/#Seeds-CLI) from a PostgreSQL dat
 - [API](#api-1)
   - [Functions](#functions)
   - [Typedefs](#typedefs)
-  - [generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename]) ⇒ <code>Promise.&lt;void&gt;</code>](#generateenvname-connection-outdir-tables-schemas-increment-schemainfilename-%E2%87%92-codepromiseltvoidgtcode)
+  - [triggerTemplate(tables, status) ⇒ <code>string</code>](#triggertemplatetables-status-%E2%87%92-codestringcode)
+  - [writeTriggerFile(dir, tableNames, prettierOptions, increment) ⇒ <code>Promise.&lt;void&gt;</code>](#writetriggerfiledir-tablenames-prettieroptions-increment-%E2%87%92-codepromiseltvoidgtcode)
+  - [generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename], [disableTriggers]) ⇒ <code>Promise.&lt;void&gt;</code>](#generateenvname-connection-outdir-tables-schemas-increment-schemainfilename-disabletriggers-%E2%87%92-codepromiseltvoidgtcode)
   - [DBConnection : <code>Object</code>](#dbconnection--codeobjectcode)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -56,7 +58,11 @@ generateSeed({
 ## Functions
 
 <dl>
-<dt><a href="#generate">generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dt><a href="#triggerTemplate">triggerTemplate(tables, status)</a> ⇒ <code>string</code></dt>
+<dd><p>Returns file contents to disable/enable all table triggers.</p></dd>
+<dt><a href="#writeTriggerFile">writeTriggerFile(dir, tableNames, prettierOptions, increment)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
+<dd><p>Writes enable/disable trigger files.</p></dd>
+<dt><a href="#generate">generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename], [disableTriggers])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Generates knex seed files from PostgreSQL database into given directory.</p></dd>
 </dl>
 
@@ -67,9 +73,45 @@ generateSeed({
 <dd><p>PostgreSQL connection options which are passed directly to node-postgres.</p></dd>
 </dl>
 
+<a name="triggerTemplate"></a>
+
+## triggerTemplate(tables, status) ⇒ <code>string</code>
+
+<p>Returns file contents to disable/enable all table triggers.</p>
+
+**Kind**: global function  
+**Returns**: <code>string</code> - <ul>
+
+<li>Content to write file.</li>
+</ul>
+
+| Param  | Type                                        | Description                                   |
+| ------ | ------------------------------------------- | --------------------------------------------- |
+| tables | <code>Array.&lt;string&gt;</code>           | <p>List of table names.</p>                   |
+| status | <code>ENABLE</code> \| <code>DISABLE</code> | <p>Whether to enable or disable triggers.</p> |
+
+<a name="writeTriggerFile"></a>
+
+## writeTriggerFile(dir, tableNames, prettierOptions, increment) ⇒ <code>Promise.&lt;void&gt;</code>
+
+<p>Writes enable/disable trigger files.</p>
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;void&gt;</code> - <ul>
+
+<li>Void</li>
+</ul>
+
+| Param           | Type                              | Description                                |
+| --------------- | --------------------------------- | ------------------------------------------ |
+| dir             | <code>string</code>               | <p>Output directory to write file.</p>     |
+| tableNames      | <code>Array.&lt;string&gt;</code> | <p>List of table names.</p>                |
+| prettierOptions | <code>prettier.Options</code>     | <p>Prettier options</p>                    |
+| increment       | <code>string</code>               | <p>Increment steps for file numbering.</p> |
+
 <a name="generate"></a>
 
-## generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename]) ⇒ <code>Promise.&lt;void&gt;</code>
+## generate([envName], [connection], [outDir], [tables], [schemas], [increment], [schemaInFilename], [disableTriggers]) ⇒ <code>Promise.&lt;void&gt;</code>
 
 <p>Generates knex seed files from PostgreSQL database into given directory.</p>
 
@@ -88,6 +130,7 @@ generateSeed({
 | [schemas]          | <code>Array.&lt;string&gt;</code>                                  | <code>[&quot;public&quot;]</code>                           | <p>List of schemas. All tables in given schemas are used to generate seed files. (If <code>tables</code> parameter is used, <code>schemas</code> parameter is ignored.)</p>                                           |
 | [increment]        | <code>number</code> \| <code>null</code> \| <code>undefined</code> | <code>1</code>                                              | <p>To order seed files an incrementing number is prepended to file names. This determines increment steps of numbers. If <code>null</code> or <code>undefined</code> are provided no numbers added to file names.</p> |
 | [schemaInFilename] | <code>boolean</code>                                               | <code>false</code>                                          | <p>Whether to append schema name in file names. (i.e. <code>01-public.member.js</code>)</p>                                                                                                                           |
+| [disableTriggers]  | <code>boolean</code>                                               | <code>true</code>                                           | <p>Disable triggers when seeding. (Prevents foreign key collisions.)</p>                                                                                                                                              |
 
 <a name="DBConnection"></a>
 

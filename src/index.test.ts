@@ -62,4 +62,9 @@ describe("generateSeed", () => {
   it("should throw if cannot find a way to connect.", async () => {
     expect(generateSeed()).rejects.toThrow("connection parameter or environment varible");
   });
+
+  it("should create without disabled triggers", async () => {
+    await generateSeed({ envName, outDir: join(TEMPDIR, "without-disable-triggers"), disableTriggers: false });
+    await expectEqualFiles(TEMPDIR, "without-disable-triggers");
+  });
 });

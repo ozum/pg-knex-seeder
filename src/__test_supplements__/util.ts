@@ -12,7 +12,7 @@ export function getRandom(): string {
  * Compares generated files by tests to expected files.
  * @private
  * @async
- * @param   {string} tempDir - Sub directory to create in temp directory.
+ * @param   {string} tempDir    - Sub directory to create in temp directory.
  * @param   {string} subDir     - Sub directory to get results to compare.
  * @returns {void}
  * @throws  {Error}             - Throws error if expect fails.

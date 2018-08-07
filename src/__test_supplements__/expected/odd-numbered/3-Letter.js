@@ -1,9 +1,9 @@
 /* eslint-disable no-use-before-define */
 
 exports.seed = function seed(knex) {
-  return knex("Item")
+  return knex("public.Letter")
     .del()
-    .then(() => knex("Item").insert(getData()));
+    .then(() => knex("public.Letter").insert(getData()));
 };
 
 function getData() {

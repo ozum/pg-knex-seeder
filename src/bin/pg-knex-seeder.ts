@@ -34,10 +34,17 @@ const options: { [name: string]: any } = {
     describe:
       "To order seed files an incrementing number is prepended to file names. This determines increment steps of numbers. If `null` or `undefined` are provided no numbers added to file names",
   },
-  schemaInFilename: {
-    type: "confirm",
+  "schema-in-filename": {
+    type: "boolean",
     default: false,
+    name: "schemaInFilename",
     describe: "Whether to append schema name in file names. (i.e. `01-public.member.js`)",
+  },
+  "disable-triggers": {
+    type: "boolean",
+    name: "disableTriggers",
+    default: true,
+    describe: "Disable triggers when seeding. (Prevents foreign key collisions.)",
   },
 };
 
@@ -52,7 +59,7 @@ yargsInteractive()
 
     const parameters = pickBy(result, (value, key) => validKeys.has(key) && value !== undefined);
 
-    console.log(parameters);
+    // console.log(parameters);
     await generate(parameters);
     return parameters;
   })

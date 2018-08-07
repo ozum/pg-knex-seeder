@@ -30,24 +30,45 @@ interface DBConnection {
 }
 
 /**
- * Returns file contents for given data.
+ * Returns file contents to seed table with given data.
  * @private
- * @param   {Object} data   - Data fetched from database.
- * @returns {string}        - Content to write in file.
+ * @param   {string} tableName  - Name of the table
+ * @param   {Object} data       - Data fetched from database.
+ * @returns {string}            - Content to write in file.
  */
-function template(data: Object): string {
+function template(tableName: string, data: Object): string {
   return `
     /* eslint-disable no-use-before-define */
 
     exports.seed = function seed(knex) {
-      return knex("Item")
+      return knex("${tableName}")
         .del()
         .then(() =>
-          knex("Item").insert(getData()));
+          knex("${tableName}").insert(getData()));
     }
 
     function getData() {
       return ${JSON.stringify(data, null, 2)};
+    }
+  `;
+}
+
+/**
+ * Returns file contents to disable/enable all table triggers.
+ * @param   {string[]}        tables  - List of table names.
+ * @param   {ENABLE|DISABLE}  status  - Whether to enable or disable triggers.
+ * @returns {string}                  - Content to write file.
+ */
+function triggerTemplate(tables: string[], status: string): string {
+  const sql = tables.map(name => `knex.raw("ALTER TABLE ?? ${status} TRIGGER ALL;", [${JSON.stringify(name)}])\n`);
+
+  return `
+    /* eslint-disable no-use-before-define */
+
+    exports.seed = function seed(knex) {
+      return Promise.all([
+        ${sql}
+      ]);
     }
   `;
 }
@@ -72,8 +93,12 @@ async function getTables(connection: DBConnection, schemas: string[], tables?: s
 
   await Promise.all(
     schemas.map(async schema => {
-      const schemaTables: Map<string, { fullName: string }> = await db.schemas.get(schema).tables;
-      allTables = allTables.concat(Array.from(schemaTables.values()).map(table => table.fullName));
+      const schemaTables: Map<string, { fullName: string; name: string }> = await db.schemas.get(schema).tables;
+      allTables = allTables.concat(
+        Array.from(schemaTables.values())
+          .filter(table => !table.name.startsWith("knex_migrations"))
+          .map(table => table.fullName),
+      );
     }),
   );
 
@@ -84,12 +109,12 @@ async function getTables(connection: DBConnection, schemas: string[], tables?: s
  * Returns next counter number as a string for given index and array. Adds zero padding left of the number. If no numbering is
  * used, returns undefined
  * @private
- * @param   {number}    index     - Returns
- * @param   {string[]}  tables    - Array of table names
- * @param   {number}    increment - Increment steps.
- * @returns {string|undefined}    - If numbering is used, next counter number as a string and zero padded at the beginning, undefined otherwise.
+ * @param   {number}            index     - Returns
+ * @param   {string[]}          tables    - Array of table names
+ * @param   {number|null}       increment - Increment steps.
+ * @returns {string|undefined}            - If numbering is used, next counter number as a string and zero padded at the beginning, undefined otherwise.
  */
-function getCounter(index: number, tables: string[], increment: number): string | undefined {
+function getCounter(index: number, tables: string[], increment?: number | null): string | undefined {
   if (!increment) {
     return undefined;
   }
@@ -109,7 +134,7 @@ function getCounter(index: number, tables: string[], increment: number): string 
  * @param   {string}            counter           - Counter number to add at the beginning of file name.
  * @returns {Promise<void>}                       - Void
  */
-async function write(
+async function writeDataFile(
   pg: knex,
   table: string,
   dir: string,
@@ -123,7 +148,34 @@ async function write(
   const file = path.join(dir, `${counter ? `${counter}-` : ""}${schemaInFileName ? table : tableWithoutSchema}.js`);
   await fs.remove(file);
 
-  return json ? fs.writeFile(file, prettier.format(template(json), prettierOptions)) : undefined;
+  return json ? fs.writeFile(file, prettier.format(template(table, json), prettierOptions)) : undefined;
+}
+
+/**
+ * Writes enable/disable trigger files.
+ * @param   {string}            dir               - Output directory to write file.
+ * @param   {string[]}          tableNames        - List of table names.
+ * @param   {prettier.Options}  prettierOptions   - Prettier options
+ * @param   {string}            increment         - Increment steps for file numbering.
+ * @returns {Promise<void>}                       - Void
+
+ */
+async function writeTriggerFile(
+  dir: string,
+  tableNames: string[],
+  prettierOptions: prettier.Options,
+  increment?: number | null,
+): Promise<void> {
+  const firstCounter = getCounter(-1, tableNames, increment);
+  const lastCounter = getCounter(tableNames.length, tableNames, increment);
+
+  const enableFile = path.join(dir, `${firstCounter ? `0-` : "aa_"}disable-triggers.js`);
+  await fs.remove(enableFile);
+  await fs.writeFile(enableFile, prettier.format(triggerTemplate(tableNames, "DISABLE"), prettierOptions));
+
+  const disableFile = path.join(dir, `${lastCounter ? `${lastCounter}-` : "zz_"}enable-triggers.js`);
+  await fs.remove(disableFile);
+  await fs.writeFile(disableFile, prettier.format(triggerTemplate(tableNames, "ENABLE"), prettierOptions));
 }
 
 /**
@@ -136,6 +188,7 @@ async function write(
  * @param   {string[]}              [schemas=["public"]]              - List of schemas. All tables in given schemas are used to generate seed files. (If `tables` parameter is used, `schemas` parameter is ignored.)
  * @param   {number|null|undefined} [increment=1]                     - To order seed files an incrementing number is prepended to file names. This determines increment steps of numbers. If `null` or `undefined` are provided no numbers added to file names.
  * @param   {boolean}               [schemaInFilename=false]          - Whether to append schema name in file names. (i.e. `01-public.member.js`)
+ * @param   {boolean}               [disableTriggers=true]            - Disable triggers when seeding. (Prevents foreign key collisions.)
  * @returns {Promise<void>}                                           - Void promise
  */
 export default async function generate({
@@ -146,14 +199,16 @@ export default async function generate({
   schemas = ["public"],
   increment = 1,
   schemaInFilename = false,
+  disableTriggers = true,
 }: {
   envName?: string;
   connection?: DBConnection;
   outDir?: string;
   tables?: string[];
   schemas?: string[];
-  increment?: number;
+  increment?: number | null;
   schemaInFilename?: boolean;
+  disableTriggers?: boolean;
 } = {}): Promise<void> {
   let pg: any;
   if (!connection && !process.env[envName]) {
@@ -173,8 +228,14 @@ export default async function generate({
     await fs.mkdirp(outDir);
     const prettierOptions = Object.assign(await prettier.resolveConfig(process.cwd(), { editorconfig: true }), { parser: "babylon" });
     await Promise.all(
-      allTables.map((table, index, arr) => write(pg, table, outDir, schemaInFilename, prettierOptions, getCounter(index, arr, increment))),
+      allTables.map((table, index, arr) =>
+        writeDataFile(pg, table, outDir, schemaInFilename, prettierOptions, getCounter(index, arr, increment)),
+      ),
     );
+
+    if (disableTriggers) {
+      await writeTriggerFile(outDir, allTables, prettierOptions, increment);
+    }
   } catch (e) {
     pg.destroy();
     throw new Error(e);
